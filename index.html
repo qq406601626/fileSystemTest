@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<textarea id="textarea"></textarea>
+<button id="openFileButton">open file</button>
+<button id="openDirectoryButton">open directory</button>
+<button id="saveAsButton">save as</button>
+</body>
+<script>
+    const textarea = document.getElementById('textarea')
+    const openFileButton = document.getElementById('openFileButton')
+    const openDirectoryButton = document.getElementById('openDirectoryButton')
+    const saveAsButton = document.getElementById('saveAsButton')
+    openFileButton.addEventListener('click', async () => {
+        const [fileHandle] = await window.showOpenFilePicker()
+        // 弹窗出现后，如果选择文件，则返回一个数组，数组中每个元素为FileSystemFileHandle文件句柄。如果点击取消，则会reject。
+        // 文件句柄可以被保存在indexDB中,这样就可以打开保留最近打开或编辑的文件列表、在打开应用程序时重新打开最后一个文件、恢复以前的工作目录等成为可能
+        // 其中每个FileSystemFileHandle包含与文件交互所需的属性和方法。
+        // 一个可选options参数可以让您影响文件选择器的行为，例如，通过允许用户选择多个文件、目录或不同的文件类型。在没有指定任何选项的情况下，文件选择器允许用户选择单个文件。这非常适合文本编辑器。
+        // 保留对文件句柄的引用很有帮助，以便以后可以使用。需要它来保存对文件的更改，或执行任何其他文件操作。
+        const file = await fileHandle.getFile()
+        // 返回一个File对象，其中包含一个 blob。注意：此方法为异步。
+        // 从blob中获取数据，请调用其方法之一： slice()、stream()、text()或arrayBuffer()。
+        const text = await file.text()
+        // 注意：此方法为异步。
+        textarea.value = text
+    })
+    openDirectoryButton.addEventListener('click', async () => {
+        const directoryHandle = await window.showDirectoryPicker()
+        // 创建一个打开文件夹的句柄，事件句柄（并非一个数组）。此时会打开一个弹窗，如果用户点击取消，则会触发reject。
+
+
+    })
+
+    saveAsButton.addEventListener('click', async () => {
+        const options = {
+            suggestedName: 'Untitled Text.txt', // 默认名称
+            startIn: 'downloads', // 默认保存位置.打开文件弹窗也可用.
+            // startIn可选项:
+            // - desktop：用户的桌面目录，如果存在的话。
+            // - documents：通常存储用户创建的文档的目录。
+            // - downloads：通常存储下载文件的目录。
+            // - music：通常存储音频文件的目录。
+            // - pictures：通常用于存储照片和其他静止图像的目录。
+            // - videos：通常存储视频/电影的目录。
+            // - directoryHandle / fileHandle
+            // startIn不能传入绝对路径
+            types: [
+                {
+                    description: 'Text Files',
+                    accept: {
+                        'text/plain': ['.txt'],
+                    },
+                },
+            ],
+        };
+        const fileHandle = await window.showSaveFilePicker(options)
+        // 创建一个保存文件的句柄，事件句柄（并非一个数组）。此时会打开一个弹窗，如果用户点击取消，则会触发reject。
+        // 对文件的写入需要依赖这个句柄的一些方法。
+        const writable = await fileHandle.createWritable();
+        // 创建文件的写入对象,为FileSystemWritableFileStream类型。
+        // 浏览器首先检查用户是否授予文件写权限。如果未授予写入权限，浏览器会提示用户授予权限。如果未授予权限，则createWritable()抛出DOMException。
+        await writable.write('hello world');
+        // 写入内容
+        // 参数可以为字符串，也可以是BufferSource或Blob。
+        // 直到流关闭（通过调用close()方法或者由管道自动关闭）之前，更改不会被写入磁盘。
+        await writable.close();
+        // 关闭写入对象
+    })
+</script>
+</html>
