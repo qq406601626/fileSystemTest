@@ -32,8 +32,6 @@
     openDirectoryButton.addEventListener('click', async () => {
         const directoryHandle = await window.showDirectoryPicker()
         // 创建一个打开文件夹的句柄，事件句柄（并非一个数组）。此时会打开一个弹窗，如果用户点击取消，则会触发reject。
-
-
     })
 
     saveAsButton.addEventListener('click', async () => {
@@ -59,6 +57,16 @@
             ],
         };
         const fileHandle = await window.showSaveFilePicker(options)
+        const isGranted = await fileHandle.queryPermission(options) === 'granted'
+        if (!isGranted) {
+            // 如果没有授权
+            await fileHandle.requestPermission(options) === 'granted'
+            // 调用授权弹窗请求用户授权.如果用户选择了同意,那么fileHandle.requestPermission授权会返回granted,否则会reject.
+        }
+        // 如果句柄是从indexDB中获取到的,那么需要先查询用户是否已经授权了读写权限.
+        const permission = await fileHandle.queryPermission({
+            mode: 'readwrite'
+        })
         // 创建一个保存文件的句柄，事件句柄（并非一个数组）。此时会打开一个弹窗，如果用户点击取消，则会触发reject。
         // 对文件的写入需要依赖这个句柄的一些方法。
         const writable = await fileHandle.createWritable();
