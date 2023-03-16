@@ -57,10 +57,13 @@
             ],
         };
         const fileHandle = await window.showSaveFilePicker(options)
-        const isGranted = await fileHandle.queryPermission(options) === 'granted'
+        const permissionOption = {
+            mode: 'readwrite'
+        }
+        const isGranted = await fileHandle.queryPermission(permissionOption) === 'granted'
         if (!isGranted) {
             // 如果没有授权
-            await fileHandle.requestPermission(options) === 'granted'
+            await fileHandle.requestPermission(permissionOption) === 'granted'
             // 调用授权弹窗请求用户授权.如果用户选择了同意,那么fileHandle.requestPermission授权会返回granted,否则会reject.
         }
         // 如果句柄是从indexDB中获取到的,那么需要先查询用户是否已经授权了读写权限.
