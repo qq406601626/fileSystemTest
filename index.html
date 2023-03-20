@@ -10,6 +10,8 @@
 <button id="openDirectoryButton">open directory</button>
 <button id="saveAsButton">save as</button>
 <button id="getResolvePathButton">resolve path</button>
+<button id="deleteFileOrDirectoryButton">delete file or directory</button>
+<button id="renameOrMoveFileOrDirectoryButton">rename or move file/directory</button>
 </body>
 <script>
     const textarea = document.getElementById('textarea')
@@ -17,6 +19,9 @@
     const openDirectoryButton = document.getElementById('openDirectoryButton')
     const saveAsButton = document.getElementById('saveAsButton')
     const getResolvePathButton = document.getElementById('getResolvePathButton')
+    const deleteFileOrDirectoryButton = document.getElementById('deleteFileOrDirectoryButton')
+    const renameOrMoveFileOrDirectoryButton = document.getElementById('renameOrMoveFileOrDirectoryButton')
+
     openFileButton.addEventListener('click', async () => {
         const [fileHandle] = await window.showOpenFilePicker()
         // 弹窗出现后，如果选择文件，则返回一个数组，数组中每个元素为FileSystemFileHandle文件句柄。如果点击取消，则会reject。
@@ -60,6 +65,7 @@
             // 在文件夹中创建一个文件
             // 如果不传参数，表示获取某个已存在的文件的句柄。
             // 如果您已经获得了对目录的访问权限，您可以使用removeEntry()方法删除其中包含的文件和文件夹。对于文件夹，删除可以选择递归进行，包括所有子文件夹和其中包含的文件。
+            // removeEntry是使用对象必须是文件夹句柄。
             await newDirectoryHandle.removeEntry('My Notes.txt');
             // 删除文件
             await entry.removeEntry('Old Stuff', { recursive: true });
@@ -124,6 +130,21 @@
         // 只有文件夹句柄有resolve方法，文件句柄没有。
         // path为一个数组。path的路径是从执行resolve()方法的文件夹句柄所在的路径开始的。
         // path不是一个绝对路径。
+    })
+
+    deleteFileOrDirectoryButton.addEventListener('click', async () => {
+        // await newDirectoryHandle.removeEntry('My Notes.txt');
+        // 删除文件
+        // await entry.removeEntry('Old Stuff', { recursive: true });
+        // 递归删除文件夹
+
+    })
+
+    renameOrMoveFileOrDirectoryButton.addEventListener('click', async () => {
+        // 可以通过在 FileSystemHandle 接口上调用 move() 方法来重命名文件和文件夹，或将它们移动到新位置。
+        // FileSystemHandle 有两个子接口：FileSystemFileHandle 和 FileSystemDirectoryHandle。
+        // move() 方法接受一或两个参数。第一个参数可以是一个包含新名称的字符串，或一个指向目标文件夹的 FileSystemDirectoryHandle。
+        // 在后一种情况下，可选的第二个参数是一个新名称的字符串，这样移动和重命名可以在一步完成。
     })
 </script>
 </html>
